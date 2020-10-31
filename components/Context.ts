@@ -1,6 +1,7 @@
 import Input from "./Input";
 import { Component } from "./interfaces";
-import KeysOverlay from "./WhiteKeysOverlay";
+import Soundfont from "soundfont-player";
+import VideoManager from "./VideoManager";
 
 export interface Config {}
 
@@ -9,29 +10,29 @@ export default class Context {
   public components: Component[];
   public videoCanvasCtx: CanvasRenderingContext2D;
   public overlayCanvasCtx: CanvasRenderingContext2D;
-  public video: HTMLVideoElement;
+  public video: VideoManager;
+  public piano: Soundfont.Player;
 
   constructor(public config?: Config) {
+    (window as any).context = this;
     this.input = new Input();
     this.components = [];
-    this.video = this.getVideoElement();
+    this.video = new VideoManager(this);
     this.videoCanvasCtx = this.getVideoCanvasCtx();
     this.overlayCanvasCtx = this.getOverlayCanvasCtx();
-  }
-
-  getVideoElement() {
-    const video = document.getElementById("video-player") as HTMLVideoElement;
-    return video;
+    Soundfont.instrument(new AudioContext(), "acoustic_grand_piano").then(
+      (piano) => (this.piano = piano)
+    );
   }
 
   getVideoCanvasCtx() {
     const videoCanvas = document.getElementById(
       "video-canvas"
     ) as HTMLCanvasElement;
-    videoCanvas.style.width = `${this.video.videoWidth}px`;
-    videoCanvas.width = this.video.videoWidth;
-    videoCanvas.style.height = `${this.video.videoHeight}px`;
-    videoCanvas.height = this.video.videoHeight;
+    videoCanvas.style.width = `${this.video.width}px`;
+    videoCanvas.width = this.video.width;
+    videoCanvas.style.height = `${this.video.height}px`;
+    videoCanvas.height = this.video.height;
 
     const videoCanvasCtx = videoCanvas.getContext("2d");
     return videoCanvasCtx;
@@ -41,10 +42,10 @@ export default class Context {
     const overlayCanvas = document.getElementById(
       "overlay-canvas"
     ) as HTMLCanvasElement;
-    overlayCanvas.style.width = `${this.video.videoWidth}px`;
-    overlayCanvas.width = this.video.videoWidth;
-    overlayCanvas.style.height = `${this.video.videoHeight}px`;
-    overlayCanvas.height = this.video.videoHeight;
+    overlayCanvas.style.width = `${this.video.width}px`;
+    overlayCanvas.width = this.video.width;
+    overlayCanvas.style.height = `${this.video.height}px`;
+    overlayCanvas.height = this.video.height;
 
     const overlayCanvasCtx = overlayCanvas.getContext("2d");
     return overlayCanvasCtx;

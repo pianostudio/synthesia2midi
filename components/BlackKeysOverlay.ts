@@ -4,6 +4,23 @@ import KeyMarker, { KeyKind } from "./KeyMarker";
 
 const NUM_BLACK_KEYS = 36;
 
+function getBaseForOctave(octave) {
+  return octave * 12;
+}
+
+let MIDI_NUM_MAP = [22 /* A#0 */];
+
+for (let octave = 0; octave < 7; octave++) {
+  MIDI_NUM_MAP = [
+    ...MIDI_NUM_MAP,
+    25 + getBaseForOctave(octave) /* C# */,
+    27 + getBaseForOctave(octave) /* D# */,
+    30 + getBaseForOctave(octave) /* F# */,
+    32 + getBaseForOctave(octave) /* G# */,
+    34 + getBaseForOctave(octave) /* A# */,
+  ];
+}
+
 export default class BlackKeysOverlay implements Component {
   context: any;
   keys: KeyMarker[];
@@ -48,7 +65,8 @@ export default class BlackKeysOverlay implements Component {
           "orange",
           this.radius,
           x,
-          this.y
+          this.y,
+          MIDI_NUM_MAP[i]
         )
       );
     }

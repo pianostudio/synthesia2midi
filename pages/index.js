@@ -12,10 +12,19 @@ export default function Home() {
       <main>
         <h1 className="title">Synthesia to MIDI</h1>
 
-        <div id="video-container">
-          <div id="video-container-inner">
-            <canvas id="video-canvas"></canvas>
-            <canvas id="overlay-canvas"></canvas>
+        <div id="video-section">
+          <div id="video-container-outer">
+            <div id="video-container-inner">
+              <canvas id="video-canvas"></canvas>
+              <canvas id="overlay-canvas"></canvas>
+            </div>
+            <div id="video-container-controls">
+              <input type="range" id="seek-bar" min="0" max="100" step="0.01" />
+              <div id="video-container-controls-row-2">
+                <button id="play-pause-button">Play / Pause</button>
+                <div id="media-time-display">00:00.000</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -39,12 +48,19 @@ export default function Home() {
           align-items: center;
         }
 
-        * {
+        *,
+        *::before,
+        *::after {
           outline: none;
+          box-sizing: border-box;
         }
 
-        #video-container {
-          background: hsl(203 25% 50% / 1);
+        canvas {
+          display: block;
+        }
+
+        #video-section {
+          background: #6497b1;
           margin-top: 3em;
           margin-bottom: 3em;
           padding: 3em;
@@ -53,39 +69,73 @@ export default function Home() {
           flex-direction: column;
           alignitems: center;
           justifycontent: center;
-          position: relative;
         }
 
         #video-player {
           margin: 0 auto;
-          // visibility: hidden;
+          visibility: hidden;
+          width: 0;
+          height: 0;
           position: absolute;
         }
 
-        #video-container-inner {
+        #seek-bar {
+          width: 100%;
+        }
+
+        #video-container-outer {
+          box-sizing: content-box;
           margin: 0 auto;
+          background: linear-gradient(
+            to bottom right,
+            hsl(204deg 55% 65%),
+            hsl(209deg 55% 80%)
+          );
+          padding: 0.5em 0.5em 0.5em 0.5em;
+          border-radius: 0.5em;
+
+          box-shadow: 0 4px 10px 0 rgba(34, 36, 38, 0.4),
+            0 3px 10px 0 rgba(34, 36, 38, 0.4);
+        }
+
+        #video-container-inner {
+          width: 1280px;
+          height: 720px;
+
           position: relative;
+        }
+
+        #video-container-controls {
+          margin-top: 0.5em;
+          width: 100%;
+        }
+
+        #play-pause-button {
+          margin-right: 1em;
+          font-size: 1em;
+          font-weight: 500;
+          align-self: center;
+        }
+
+        #media-time-display {
+          font-size: 1.25em;
+          font-weight: 500;
+          display: block;
+          align-self: center;
+          width: 100px;
         }
 
         #video-canvas,
         #overlay-canvas {
-          width: 100%;
-          height: 100%;
-        }
+          width: inherit;
+          height: inherit;
+          border: none;
 
-        #overlay-canvas {
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-
-          // border: 0.5em solid;
-          // border-image-slice: 1;
-          // border-width: 0.5em 0.5em 3em 0.5em;
-          // border-image-source: linear-gradient(to left, #677e8c, #2c404c);
-          box-shadow: 0 4px 10px 0 rgba(34, 36, 38, 0.4),
-            0 3px 10px 0 rgba(34, 36, 38, 0.4);
         }
 
         #video-canvas main {
@@ -94,6 +144,12 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           align-items: center;
+        }
+
+        #video-container-controls-row-2 {
+          display: flex;
+          justify-content: center;
+          align-items: baseline;
         }
 
         a {
@@ -183,7 +239,7 @@ export default function Home() {
       <style jsx global>{`
         html,
         body {
-          background: #b8c2cb;
+          background: #b3cde0;
           color: #36414d;
           padding: 0;
           margin: 0;

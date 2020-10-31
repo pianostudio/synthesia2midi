@@ -3,6 +3,7 @@ import Context from "./Context";
 import VideoCanvasMirror from "./VideoCanvasMirror";
 import WhiteKeysOverlay from "./WhiteKeysOverlay";
 import BlackKeysOverlay from "./BlackKeysOverlay";
+import HoverColorDebug from "./HoverColorDebug";
 
 export default class App {
   public context: Context;
@@ -27,18 +28,17 @@ export default class App {
   }
 
   onAddComponents() {
-    this.context.components = [];
-    this.context.components.push(new VideoCanvasMirror(this.context));
-    this.context.components.push(
-      new WhiteKeysOverlay(this.context, 3, 10, 24.725, 685)
-    );
-    this.context.components.push(
-      new BlackKeysOverlay(this.context, 3, 26, 28.58, 615)
-    );
+    const { context } = this;
+
+    context.components = [];
+    context.components.push(new VideoCanvasMirror(context));
+    // context.components.push(new HoverColorDebug(context));
+    context.components.push(new WhiteKeysOverlay(context, 3, 10, 24.725, 685));
+    context.components.push(new BlackKeysOverlay(context, 3, 26, 28.58, 615));
   }
 
   setup() {
-    this.context.video.currentTime = 9;
+    this.context.video.element.currentTime = 9;
 
     for (const component of this.context.components) {
       component.setup();
@@ -46,6 +46,8 @@ export default class App {
   }
 
   onAppLoop() {
+    this.context.video.update();
+
     for (const component of this.context.components) {
       component.update();
     }
@@ -60,66 +62,24 @@ export default class App {
   clearScreen() {
     const { videoCanvasCtx, overlayCanvasCtx, video } = this.context;
 
-    videoCanvasCtx.clearRect(0, 0, video.videoWidth, video.videoHeight);
-    overlayCanvasCtx.clearRect(0, 0, video.videoWidth, video.videoHeight);
-  }
-
-  drawKeysOverlay() {
-    const ctx = this.overlayCanvasCtx;
-
-    {
-      const config = this.config.keysOverlay.whites;
-
-      for (let i = 0; i < config.count; i++) {
-        const isPitchC = (i - 2) % 7 === 0;
-        const radius = isPitchC ? config.radius * 1.25 : config.radius;
-
-        ctx.fillStyle = isPitchC ? "darkorange" : "orange";
-        const keyX = config.offsetX + i * config.deltaX;
-        const keyY = config.y;
-      }
-    }
-
-    {
-      const config = this.config.keysOverlay.blacks;
-
-      for (let i = 0; i < config.count; i++) {
-        let extraOffset = 0;
-
-        if (i > 0) {
-          extraOffset -= 30;
-        }
-
-        const seqIdx = ((i - 1) % 5) + 1;
-        const multiplier = Math.floor((i - 1) / 5) + 1;
-
-        extraOffset += 30 * multiplier;
-
-        if (seqIdx >= 3) {
-          extraOffset += 15;
-        }
-        if (seqIdx >= 1) {
-          extraOffset += 15;
-        }
-
-        ctx.fillStyle = "orange";
-        const keyX = extraOffset + config.offsetX + i * config.deltaX;
-        const keyY = config.y;
-      }
-    }
+    videoCanvasCtx.clearRect(0, 0, video.width, video.height);
+    overlayCanvasCtx.clearRect(0, 0, video.width, video.height);
   }
 }
 
 if (typeof window !== "undefined") {
   function onDocumentReadyStateChange() {
+    if ((window as any).app) {
+      return;
+    }
+
+    (window as any).app = new App();
     new App().run();
   }
 
   if (document.readyState !== "complete") {
-    console.log("A");
     document.addEventListener("readystatechange", onDocumentReadyStateChange);
   } else {
-    console.log("B");
     onDocumentReadyStateChange();
   }
 }

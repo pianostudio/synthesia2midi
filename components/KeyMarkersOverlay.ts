@@ -4,26 +4,7 @@ import KeyMarker, { KeyKind } from "./KeyMarker";
 
 const NUM_WHITE_KEYS = 52;
 
-function getBaseForOctave(octave) {
-  return octave * 12;
-}
-
-let MIDI_NUM_MAP = [21 /* A0 */, 23 /* B0 */, 24 /* C0 */];
-
-for (let octave = 0; octave < 7; octave++) {
-  MIDI_NUM_MAP = [
-    ...MIDI_NUM_MAP,
-    26 + getBaseForOctave(octave) /* D */,
-    28 + getBaseForOctave(octave) /* E */,
-    29 + getBaseForOctave(octave) /* F */,
-    31 + getBaseForOctave(octave) /* G */,
-    33 + getBaseForOctave(octave) /* A */,
-    35 + getBaseForOctave(octave) /* B */,
-    36 + getBaseForOctave(octave) /* C */,
-  ];
-}
-
-export default class WhiteKeysOverlay implements Component {
+export default class KeyMarkersOverlay implements Component {
   context: any;
   keys: KeyMarker[];
 
@@ -48,11 +29,11 @@ export default class WhiteKeysOverlay implements Component {
         new KeyMarker(
           this.context,
           KeyKind.White,
-          "orange",
-          this.radius,
+          isPitchC ? "darkorange" : "orange",
+          isPitchC ? this.radius * 1.25 : this.radius,
           x,
           this.y,
-          MIDI_NUM_MAP[i]
+          i + 21
         )
       );
     }
