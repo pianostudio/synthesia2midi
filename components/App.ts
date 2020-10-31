@@ -38,7 +38,7 @@ export default class App {
   }
 
   setup() {
-    this.context.video.element.currentTime = 9;
+    this.context.video.element.currentTime = 3 * 60 + 30.835;
 
     for (const component of this.context.components) {
       component.setup();

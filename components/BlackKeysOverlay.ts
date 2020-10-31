@@ -61,7 +61,7 @@ export default class BlackKeysOverlay implements Component {
       this.keys.push(
         new KeyMarker(
           this.context,
-          KeyKind.White,
+          KeyKind.Black,
           "orange",
           this.radius,
           x,
