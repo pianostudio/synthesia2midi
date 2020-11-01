@@ -52,7 +52,8 @@ export default class WhiteKeysOverlay implements Component {
           this.radius,
           x,
           this.y,
-          MIDI_NUM_MAP[i]
+          MIDI_NUM_MAP[i],
+          i
         )
       );
     }

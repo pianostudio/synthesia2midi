@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@tonejs/midi": "^2.0.25",
     "@types/tinycolor2": "^1.4.2",
     "next": "^10.0.0",
     "react": "16.13.1",

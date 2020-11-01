@@ -4,6 +4,8 @@ import VideoCanvasMirror from "./VideoCanvasMirror";
 import WhiteKeysOverlay from "./WhiteKeysOverlay";
 import BlackKeysOverlay from "./BlackKeysOverlay";
 import HoverColorDebug from "./HoverColorDebug";
+import WhiteKeySparksOverlay from "./WhiteKeySparksOverlay";
+import BlackKeySparksOverlay from "./BlackKeySparksOverlay";
 
 export default class App {
   public context: Context;
@@ -30,17 +32,44 @@ export default class App {
   onAddComponents() {
     const { context } = this;
 
-    context.components = [];
-    context.components.push(new VideoCanvasMirror(context));
+    context.components = {};
+    context.components.videoCanvasMirror = new VideoCanvasMirror(context);
     // context.components.push(new HoverColorDebug(context));
-    context.components.push(new WhiteKeysOverlay(context, 3, 10, 24.725, 685));
-    context.components.push(new BlackKeysOverlay(context, 3, 26, 28.58, 615));
+    context.components.whiteKeysOverlay = new WhiteKeysOverlay(
+      context,
+      3,
+      10,
+      24.725,
+      685
+    );
+    context.components.whiteKeySparksOverlay = new WhiteKeySparksOverlay(
+      context,
+      2,
+      10,
+      24.725,
+      553
+    );
+    context.components.blackKeysOverlay = new BlackKeysOverlay(
+      context,
+      3,
+      26,
+      28.58,
+      615
+    );
+    context.components.blackKeySparksOverlay = new BlackKeySparksOverlay(
+      context,
+      2,
+      26,
+      28.58,
+      553
+    );
   }
 
   setup() {
+    this.context.video.element.playbackRate = 1;
     this.context.video.element.currentTime = 3 * 60 + 30.835;
 
-    for (const component of this.context.components) {
+    for (const [name, component] of Object.entries(this.context.components)) {
       component.setup();
     }
   }
@@ -48,12 +77,12 @@ export default class App {
   onAppLoop() {
     this.context.video.update();
 
-    for (const component of this.context.components) {
+    for (const [name, component] of Object.entries(this.context.components)) {
       component.update();
     }
 
     this.clearScreen();
-    for (const component of this.context.components) {
+    for (const [name, component] of Object.entries(this.context.components)) {
       component.draw();
     }
     requestAnimationFrame(this.onAppLoop.bind(this));

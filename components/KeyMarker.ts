@@ -2,6 +2,9 @@ import Context from "./Context";
 import { Component } from "./interfaces";
 import tinycolor from "tinycolor2";
 import { Player } from "soundfont-player";
+import BlackKeySparksOverlay from "./BlackKeySparksOverlay";
+import WhiteKeySparksOverlay from "./WhiteKeySparksOverlay";
+import SparkMarker from "./SparkMarker";
 
 const DEBUG_PITCH = true;
 
@@ -11,9 +14,9 @@ export enum KeyKind {
 }
 
 export enum DetectedKeyKind {
-  LeftHand = "Left Hand",
-  RightHand = "Right Hand",
-  None = "None",
+  LeftHand = "l",
+  RightHand = "r",
+  None = "?",
 }
 
 export default class KeyMarker implements Component {
@@ -23,6 +26,7 @@ export default class KeyMarker implements Component {
   detectedKeyKind: DetectedKeyKind;
   prevDetectedKeyKind: DetectedKeyKind;
   cancellablePlay: Player;
+  prevGapDetected: boolean;
 
   constructor(
     context: Context,
@@ -31,7 +35,8 @@ export default class KeyMarker implements Component {
     public radius: number,
     public x: number,
     public y: number,
-    public pitch: number
+    public pitch: number,
+    public index: number
   ) {
     this.context = context;
   }
@@ -68,9 +73,48 @@ export default class KeyMarker implements Component {
 
     this.detectedKeyKind = this.getDetectedKeyKind();
 
+    this.restartPlayIfGapDetected();
+
     if (this.prevDetectedKeyKind !== this.detectedKeyKind) {
       this.prevDetectedKeyKind = this.detectedKeyKind;
       this.playDetectedKey();
+    }
+  }
+
+  restartPlayIfGapDetected() {
+    const { piano, components } = this.context;
+
+    if (!piano) {
+      return;
+    }
+
+    const sparks: SparkMarker[] = ((this.kind === KeyKind.Black
+      ? components.blackKeySparksOverlay
+      : components.whiteKeySparksOverlay) as
+      | WhiteKeySparksOverlay
+      | BlackKeySparksOverlay).sparks;
+
+    const spark = sparks[this.index];
+
+    if (this.prevGapDetected === spark.gapDetected) {
+      return;
+    } else {
+      this.prevGapDetected = spark.gapDetected;
+    }
+
+    if (
+      spark.gapDetected &&
+      this.prevDetectedKeyKind !== DetectedKeyKind.None &&
+      this.detectedKeyKind !== DetectedKeyKind.None
+    ) {
+      if (this.cancellablePlay) {
+        console.log(`off:-:${this.pitch}:${performance.now()}`);
+        this.cancellablePlay.stop();
+        this.cancellablePlay = piano.play(`${this.pitch}`);
+        console.log(
+          `on:${this.detectedKeyKind}:${this.pitch}:${performance.now()}`
+        );
+      }
     }
   }
 
@@ -82,11 +126,17 @@ export default class KeyMarker implements Component {
     }
 
     if (this.detectedKeyKind === DetectedKeyKind.None) {
+      console.log(
+        `off:${this.prevDetectedKeyKind}:${this.pitch}:${performance.now()}`
+      );
       if (this.cancellablePlay) {
         this.cancellablePlay.stop();
       }
     } else {
       this.cancellablePlay = piano.play(`${this.pitch}`);
+      console.log(
+        `on:${this.detectedKeyKind}:${this.pitch}:${performance.now()}`
+      );
     }
   }
 
@@ -182,7 +232,7 @@ export default class KeyMarker implements Component {
       ctx.fillText(
         this.pitch.toString(),
         x,
-        y + (this.kind === KeyKind.Black ? 45 : 15)
+        y + (this.kind === KeyKind.Black ? 43 : 15)
       );
     }
   }

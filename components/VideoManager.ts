@@ -18,10 +18,12 @@ export default class VideoManager implements Component {
   }
 
   get height() {
+    return 720;
     return this.element.videoHeight;
   }
 
   get width() {
+    return 1280;
     return this.element.videoWidth;
   }
 
